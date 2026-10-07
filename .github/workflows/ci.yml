@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   backend:
-    name: Backend build and tests
+    name: Backend build, tests and image scan
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -29,3 +29,34 @@ jobs:
 
       - name: Build Docker image
         run: docker build -t supermarket-backend .
+
+      - name: Scan Docker image with Trivy
+        run: |
+          docker run --rm \
+            -v /var/run/docker.sock:/var/run/docker.sock \
+            aquasec/trivy:0.75.0 image \
+            --exit-code 1 --severity CRITICAL --ignore-unfixed \
+            supermarket-backend
+
+  secrets:
+    name: Secret scan (Gitleaks)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: gitleaks/gitleaks-action@v3
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  sast:
+    name: Static analysis (Semgrep)
+    runs-on: ubuntu-latest
+    container:
+      image: semgrep/semgrep:1.179.0
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run Semgrep
+        run: semgrep scan --config p/java --config p/owasp-top-ten --error --metrics=off
