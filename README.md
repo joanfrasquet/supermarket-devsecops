@@ -11,7 +11,7 @@ Inventory and order management for a supermarket, built with **Spring Boot** and
 
 | Layer | Tech |
 | --- | --- |
-| Backend | Java 21, Spring Boot 3, Spring Data JPA, PostgreSQL |
+| Backend | Java 21, Spring Boot 4, Spring Data JPA, PostgreSQL |
 | Frontend | React + Vite + TypeScript *(coming soon)* |
 | Infrastructure | Docker, Docker Compose |
 | CI/CD | GitHub Actions |
