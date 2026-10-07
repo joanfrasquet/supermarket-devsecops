@@ -25,7 +25,7 @@ cp .env.example .env          # then edit the password
 docker compose up --build     # starts PostgreSQL and the API
 ```
 
-The API is available at `http://localhost:8080/api/products` and the health check at `http://localhost:8080/actuator/health`.
+The API is available at `http://localhost:8080/api/products` and `http://localhost:8080/api/orders`, and the health check at `http://localhost:8080/actuator/health`.
 
 Run the backend tests:
 
@@ -34,12 +34,14 @@ cd backend
 ./mvnw test
 ```
 
+The integration tests start a real PostgreSQL with Testcontainers when Docker is running, and are skipped otherwise.
+
 ## Roadmap
 
 - [x] Project structure, PostgreSQL with Docker, Spring Boot skeleton
 - [x] CI: build, tests and Docker image
 - [x] Product CRUD with input validation
-- [ ] Orders
+- [x] Orders that take units out of stock, with unit and PostgreSQL integration tests
 - [ ] Authentication with JWT and roles (ADMIN, EMPLOYEE)
 - [ ] React frontend
 - [x] Security pipeline: CodeQL, Semgrep, Gitleaks, Trivy and Dependabot
@@ -49,6 +51,8 @@ cd backend
 - Secrets live in `.env`, which is git-ignored. `.env.example` documents the variables.
 - The backend container runs as a non-root user on a minimal JRE image.
 - Requests use a dedicated `ProductRequest` without an `id`, so clients cannot overwrite other products (mass assignment).
+- Orders only accept product ids and quantities. Prices and totals are calculated on the server, so a client cannot choose what it pays.
+- Placing an order locks the product rows until it finishes, so two orders at the same time cannot both take the last unit.
 - Every push runs:
   - **CodeQL** and **Semgrep** (OWASP Top 10 rules) for static code analysis
   - **Gitleaks** to catch committed secrets
