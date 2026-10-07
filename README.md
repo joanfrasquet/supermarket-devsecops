@@ -1,6 +1,7 @@
 # Supermarket DevSecOps
 
 [![CI](https://github.com/joanfrasquet/supermarket-devsecops/actions/workflows/ci.yml/badge.svg)](https://github.com/joanfrasquet/supermarket-devsecops/actions/workflows/ci.yml)
+[![CodeQL](https://github.com/joanfrasquet/supermarket-devsecops/actions/workflows/codeql.yml/badge.svg)](https://github.com/joanfrasquet/supermarket-devsecops/actions/workflows/codeql.yml)
 
 Inventory and order management for a supermarket, built with **Spring Boot** and **React**, with a CI/CD pipeline that tests and security-scans every commit.
 
@@ -36,16 +37,23 @@ cd backend
 ## Roadmap
 
 - [x] Project structure, PostgreSQL with Docker, Spring Boot skeleton
-- [x] Basic CI: build, tests and Docker image
-- [ ] Full product CRUD and orders
+- [x] CI: build, tests and Docker image
+- [x] Product CRUD with input validation
+- [ ] Orders
 - [ ] Authentication with JWT and roles (ADMIN, EMPLOYEE)
 - [ ] React frontend
-- [ ] Security pipeline: CodeQL, Semgrep, dependency scanning, Gitleaks, Trivy
+- [x] Security pipeline: CodeQL, Semgrep, Gitleaks, Trivy and Dependabot
 
 ## Security
 
 - Secrets live in `.env`, which is git-ignored. `.env.example` documents the variables.
 - The backend container runs as a non-root user on a minimal JRE image.
+- Requests use a dedicated `ProductRequest` without an `id`, so clients cannot overwrite other products (mass assignment).
+- Every push runs:
+  - **CodeQL** and **Semgrep** (OWASP Top 10 rules) for static code analysis
+  - **Gitleaks** to catch committed secrets
+  - **Trivy** to scan the Docker image, failing on critical vulnerabilities
+  - **Dependabot** opens weekly PRs for outdated Maven, Docker and Actions dependencies
 
 ## License
 
