@@ -4,13 +4,25 @@ updates:
     directory: /backend
     schedule:
       interval: weekly
+    cooldown:
+      default-days: 7
 
   - package-ecosystem: docker
     directory: /backend
     schedule:
       interval: weekly
+    cooldown:
+      default-days: 7
+    ignore:
+      # Stay on the Java 21 LTS images; move to the next LTS on purpose, not automatically.
+      - dependency-name: eclipse-temurin
+        update-types: ["version-update:semver-major"]
+      - dependency-name: maven
+        update-types: ["version-update:semver-major"]
 
   - package-ecosystem: github-actions
     directory: /
     schedule:
       interval: weekly
+    cooldown:
+      default-days: 7
